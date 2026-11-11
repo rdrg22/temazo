@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Temazo — adivina la canción con el mínimo de música</title>
+<meta name="description" content="Escucha medio segundo. Adivina la canción. Cada fallo te da un poco más de música.">
+<meta name="theme-color" content="#f3ede2">
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="./" aria-label="Temazo, inicio">
+    <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true">
+      <rect class="bm-tile" x="5" y="5" width="54" height="54" rx="16" transform="rotate(-8 32 32)"/>
+      <circle cx="32" cy="32" r="22" fill="#15130f"/>
+      <circle cx="32" cy="32" r="17.500" fill="none" stroke="#fff" stroke-opacity=".16" stroke-width="1"/>
+      <circle cx="32" cy="32" r="13.500" fill="none" stroke="#fff" stroke-opacity=".16" stroke-width="1"/>
+      <circle cx="32" cy="32" r="10" fill="#f3ede2"/>
+      <path class="bm-play" d="M28.800 26.600v10.800a1 1 0 0 0 1.500.86l9.200-5.400a1 1 0 0 0 0-1.720l-9.200-5.400a1 1 0 0 0-1.500.86z"/>
+    </svg>
+    <span class="brand-name">tema<b>zo</b><i>!</i></span>
+  </a>
+  <nav class="modes" role="tablist" aria-label="Modo de juego">
+    <button role="tab" data-mode="daily">Diario</button>
+    <button role="tab" data-mode="endless">Infinito</button>
+    <button role="tab" data-mode="archive">Archivo</button>
+  </nav>
+  <div class="tools">
+    <button class="icon-btn" id="btnStats" aria-label="Estadísticas" title="Estadísticas">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V10M12 20V4M19 20v-7"/></svg>
+    </button>
+    <button class="icon-btn" id="btnHelp" aria-label="Cómo se juega" title="Cómo se juega">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.2 9a3 3 0 1 1 4.6 2.5c-1 .7-1.8 1.300-1.800 2.500M12 17.500v.01"/></svg>
+    </button>
+    <button class="icon-btn" id="btnSettings" aria-label="Ajustes" title="Ajustes">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>
+    </button>
+  </div>
+</header>
+
+<main>
+  <div class="cats" id="cats" role="tablist" aria-label="Categoría"></div>
+  <section id="view" aria-live="polite"></section>
+</main>
+
+<footer class="foot">
+  <span>Fragmentos de 30 s servidos por Deezer.</span>
+  <span><kbd>Espacio</kbd> reproducir · <kbd>Tab</kbd> saltar · <kbd>Intro</kbd> elegir</span>
+</footer>
+
+<dialog id="dlgHelp" class="dlg">
+  <form method="dialog"><button class="dlg-x" aria-label="Cerrar">×</button></form>
+  <h2>Cómo se juega</h2>
+  <p class="lead">Suena medio segundo de una canción. Di cuál es.</p>
+  <ol class="steps">
+    <li><b>Escucha</b> el fragmento. Empieza en 0,5 s.</li>
+    <li><b>Busca</b> la canción y elígela, o <b>salta</b> si no te suena.</li>
+    <li>Cada fallo o salto <b>alarga el fragmento</b>: 1, 2, 4, 8 y 16 segundos.</li>
+    <li>Tienes <b>6 intentos</b>. Cuanto antes aciertes, más puntos.</li>
+  </ol>
+  <ul class="legend">
+    <li><i class="sq ok"></i> Acertaste</li>
+    <li><i class="sq artist"></i> Es otro tema del mismo artista</li>
+    <li><i class="sq bad"></i> No es</li>
+    <li><i class="sq skip"></i> Saltado</li>
+  </ul>
+  <p class="muted">Las pistas (año, portada pixelada e inicial del artista) se desbloquean a partir del segundo fallo. Hay una canción nueva al día en cada categoría, y el modo Infinito no se acaba nunca.</p>
+  <form method="dialog"><button class="btn primary wide">A jugar</button></form>
+</dialog>
+
+<dialog id="dlgStats" class="dlg">
+  <form method="dialog"><button class="dlg-x" aria-label="Cerrar">×</button></form>
+  <h2>Estadísticas</h2>
+  <div id="statsBody"></div>
+</dialog>
+
+<dialog id="dlgSettings" class="dlg">
+  <form method="dialog"><button class="dlg-x" aria-label="Cerrar">×</button></form>
+  <h2>Ajustes</h2>
+  <div class="set-row">
+    <span>Tema</span>
+    <div class="seg" id="setTheme">
+      <button data-v="auto">Auto</button><button data-v="light">Claro</button><button data-v="dark">Oscuro</button>
+    </div>
+  </div>
+  <label class="set-row"><span>Volumen</span><input type="range" id="setVol" min="0" max="1" step="0.05"></label>
+  <label class="set-row"><span>Pistas tras fallar<small>Año, portada pixelada e inicial</small></span><input type="checkbox" id="setHints" class="switch"></label>
+  <label class="set-row"><span>Reproducir solo tras cada intento</span><input type="checkbox" id="setAuto" class="switch"></label>
+  <div class="set-row"><span>Borrar todo el progreso</span><button class="btn danger" id="setReset">Borrar</button></div>
+</dialog>
+
+<div id="toast" role="status"></div>
+
+<script src="catalog.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
